@@ -16,14 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+var torch = false;
+var beep = false;
 
-function barcodescan() {
+
+function barcodescan(torch, beep) {
     cordova.plugins.barcodeScanner.scan(
         function (result) {
             alert("We got a barcode\n" +
-                  "Result: " + result.text + "\n" +
-                  "Format: " + result.format + "\n" +
-                  "Cancelled: " + result.cancelled);
+                "Result: " + result.text + "\n" +
+                "Format: " + result.format + "\n" +
+                "Cancelled: " + result.cancelled);
         },
         function (error) {
             alert("Scanning failed: " + error);
@@ -31,22 +34,25 @@ function barcodescan() {
         {
             // preferFrontCamera : true, // iOS and Android
             // showFlipCameraButton : true, // iOS and Android
-            showTorchButton : true, // iOS and Android
-            // torchOn: false, // Android, launch with the torch switched on (if available)
+            showTorchButton: true, // iOS and Android
+            torchOn: torch, // Android, launch with the torch switched on (if available)
             saveHistory: true, // Android, save scan history (default false)
-            prompt : "Place a barcode inside the scan area", // Android
+            prompt: "Place a barcode inside the scan area", // Android
             // resultDisplayDuration: 500, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
             // formats : "QR_CODE,PDF_417", // default: all but PDF_417 and RSS_EXPANDED
             // orientation : "landscape", // Android only (portrait|landscape), default unset so it rotates with the device
             // disableAnimations : true, // iOS
-            disableSuccessBeep: false // iOS and Android
+            disableSuccessBeep: beep // iOS and Android
         }
     );
 }
 
+
+
+
 var app = {
     // Application Constructor
-    initialize: function() {
+    initialize: function () {
         document.addEventListener('deviceready', this.onDeviceReady.bind(this), false);
     },
 
@@ -54,13 +60,29 @@ var app = {
     //
     // Bind any cordova events here. Common events are:
     // 'pause', 'resume', etc.
-    onDeviceReady: function() {
+    onDeviceReady: function () {
         this.receivedEvent('deviceready');
-        document.getElementById('barcodescanner').addEventListener('click', barcodescan);
+        document.getElementById('barcodescanner').addEventListener('click', function(){
+            barcodescan(torch, beep);
+        });
+        document.getElementById('torchToggle').addEventListener('click', function() {
+            if (this.checked == true) {
+                torch = true;
+            } else {
+                torch = false;
+            }
+        });
+        document.getElementById('beepToggle').addEventListener('click', function() {
+            if (this.checked == true) {
+                beep = true;
+            } else {
+                beep = false;
+            }
+        });
     },
 
     // Update DOM on a Received Event
-    receivedEvent: function(id) {
+    receivedEvent: function (id) {
         var parentElement = document.getElementById(id);
         var listeningElement = parentElement.querySelector('.listening');
         var receivedElement = parentElement.querySelector('.received');
@@ -73,3 +95,4 @@ var app = {
 };
 
 app.initialize();
+
